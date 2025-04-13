@@ -1,111 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Todo List APP test</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
-                color: #333;
-                margin: 0;
-                padding: 0;
-            }
+<head>
+  <meta charset="UTF-8" />
+  <title>Vibrant ToDo Universe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f9d423, #ff4e50);
+      margin: 0;
+      padding: 20px;
+      color: #fff;
+    }
 
-            h1 {
-                background-color: #4CAF50;
-                color: white;
-                margin: 0;
-                padding: 20px;
-                text-align: center;
-            }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 3em;
+      text-shadow: 2px 2px #000;
+    }
 
-            ul {
-                list-style: none;
-                padding: 0;
-            }
+    .todo-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
 
-            ul li {
-                background: #fff;
-                border: 1px solid #ddd;
-                margin-bottom: 10px;
-                padding: 10px;
-                position: relative;
-            }
+    .section {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 15px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
 
-            ul li a {
-                color: #333;
-                text-decoration: none;
-                font-weight: bold;
-            }
+    .section h2 {
+      border-bottom: 2px solid #fff;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+    }
 
-            ul li a:hover {
-                color: #4CAF50;
-            }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-            .delete-btn {
-                color: red;
-                position: absolute;
-                right: 10px;
-                top: 10px;
-            }
+    .todo-item input[type="checkbox"] {
+      margin-right: 10px;
+    }
 
-            .edit-btn {
-                color: #FFC107;
-                position: absolute;
-                right: 40px;
-                top: 10px;
-            }
+    .todo-item.completed span {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
 
-            form {
-                background: #fff;
-                padding: 20px;
-                margin-top: 20px;
-            }
+    form {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
-            label {
-                display: block;
-                margin-bottom: 10px;
-            }
+    input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
 
-            input[type="text"] {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 10px;
-                border: 1px solid #ddd;
-            }
+    button {
+      background-color: #ffffff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-            input[type="submit"] {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                cursor: pointer;
-            }
+    button:hover {
+      background-color: #ffe082;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 The Ultimate ToDo Universe 🔥</h1>
 
-            input[type="submit"]:hover {
-                background-color: #45a049;
-            }
-        </style>
-    </head>
+  <div class="todo-container" id="todoContainer">
+    <!-- Sections will be injected here -->
+  </div>
 
-    <body>
-        <h1>Hello Junoon Batch 8 (Jenkins), Write your plan on Learning Jenkins</h1>
-        <ul>
-            <% todolist.forEach(function(todo, index) { %>
-            <li>
-                <a href="/todo/delete/<%= index %>" class="delete-btn">✘</a>
-                <a href="/todo/<%= index %>" class="edit-btn">✎</a>
-                <%- todo %>
-            </li>
-            <% }); %>
-        </ul>
+  <script>
+    const categories = ['Health', 'Study', 'Work', 'Homemaking'];
+    const todos = {
+      Health: [],
+      Study: [],
+      Work: [],
+      Homemaking: [],
+    };
 
-        <form action="/todo/add/" method="post">
-            <p>
-                <label for="newtodo">What should I do?</label>
-                <input type="text" name="newtodo" id="newtodo" autofocus />
-                <input type="submit" value="Add" />
-            </p>
-        </form>
-    </body>
+    function renderTodos() {
+      const container = document.getElementById('todoContainer');
+      container.innerHTML = '';
+      categories.forEach(cat => {
+        const section = document.createElement('div');
+        section.className = 'section';
+
+        const title = document.createElement('h2');
+        title.textContent = cat;
+        section.appendChild(title);
+
+        todos[cat].forEach((task, i) => {
+          const div = document.createElement('div');
+          div.className = 'todo-item' + (task.done ? ' completed' : '');
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = task.done;
+          checkbox.onchange = () => {
+            task.done = !task.done;
+            renderTodos();
+          };
+
+          const span = document.createElement('span');
+          span.textContent = task.text;
+
+          div.appendChild(checkbox);
+          div.appendChild(span);
+          section.appendChild(div);
+        });
+
+        const form = document.createElement('form');
+        form.onsubmit = e => {
+          e.preventDefault();
+          const input = form.querySelector('input');
+          const value = input.value.trim();
+          if (value) {
+            todos[cat].push({ text: value, done: false });
+            input.value = '';
+            renderTodos();
+          }
+        };
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Add new task...';
+
+        const btn = document.createElement('button');
+        btn.type = 'submit';
+        btn.textContent = 'Add';
+
+        form.appendChild(input);
+        form.appendChild(btn);
+        section.appendChild(form);
+
+        container.appendChild(section);
+      });
+    }
+
+    renderTodos();
+  </script>
+</body>
 </html>
